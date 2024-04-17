@@ -66,10 +66,47 @@ test_file_storage.py'])
                              "{:s} method needs a docstring".format(func[0]))
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
+            
+    class TestFileStorage(unittest.TestCase):
+        """Tests for the FileStorage methods: get and count"""
 
+    @classmethod
+    def setUpClass(cls):
+        """Prepare for tests"""
+        cls.storage = FileStorage()
+        cls.storage.reload()
 
-class TestFileStorage(unittest.TestCase):
-    """Test the FileStorage class"""
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_none(self):
+        """Test get method with None as class or id"""
+        self.assertIsNone(cls.storage.get(None, None))
+        self.assertIsNone(cls.storage.get(State, None))
+        self.assertIsNone(cls.storage.get(None, 'some_id'))
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_valid(self):
+        """Test get method with valid class and id"""
+        state = State(name="TestState")
+        cls.storage.new(state)
+        cls.storage.save()
+        queried_state = cls.storage.get(State, state.id)
+        self.assertEqual(queried_state, state)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count_none(self):
+        """Test count method with None as class"""
+        initial_count = len(cls.storage.all())
+        self.assertEqual(cls.storage.count(), initial_count)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count_valid_class(self):
+        """Test count method with valid class"""
+        initial_count = cls.storage.count(State)
+        state = State(name="TestState")
+        cls.storage.new(state)
+        cls.storage.save()
+        self.assertEqual(cls.storage.count(State), initial_count + 1)
+
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_all_returns_dict(self):
         """Test that all returns the FileStorage.__objects attr"""

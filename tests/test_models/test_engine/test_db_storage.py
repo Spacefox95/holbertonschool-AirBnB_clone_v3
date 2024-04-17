@@ -66,6 +66,42 @@ test_db_storage.py'])
                              "{:s} method needs a docstring".format(func[0]))
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
+            
+    class TestDBStorage(unittest.TestCase):
+        """Tests for the DBStorage methods: get and count"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up for test cases"""
+        cls.storage = DBStorage()
+        cls.storage.reload()
+
+    def test_get_none(self):
+        """Test get method with None as class or id"""
+        self.assertIsNone(cls.storage.get(None, None))
+        self.assertIsNone(cls.storage.get(State, None))
+        self.assertIsNone(cls.storage.get(None, 'some_id'))
+
+    def test_get_valid(self):
+        """Test get method with valid class and id"""
+        state = State(name="TestState")
+        cls.storage.new(state)
+        cls.storage.save()
+        queried_state = cls.storage.get(State, state.id)
+        self.assertEqual(queried_state, state)
+
+    def test_count_none(self):
+        """Test count method with None as class"""
+        initial_count = len(cls.storage.all())
+        self.assertEqual(cls.storage.count(), initial_count)
+
+    def test_count_valid_class(self):
+        """Test count method with valid class"""
+        initial_count = cls.storage.count(State)
+        state = State(name="TestState")
+        cls.storage.new(state)
+        cls.storage.save()
+        self.assertEqual(cls.storage.count(State), initial_count + 1)
 
 
 class TestFileStorage(unittest.TestCase):
