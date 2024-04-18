@@ -8,10 +8,12 @@ from models.review import Review
 from models.state import State
 from models.user import User
 
+
 @app_views.route('/status', methods=['GET'])
 def get_status():
     """Returns a JSON status response."""
     return jsonify({"status": "OK"})
+
 
 @app_views.route('/stats', methods=['GET'])
 def get_stats():
