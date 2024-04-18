@@ -13,7 +13,7 @@ from api.v1.views import app_views
 @app_views.route('/places/<place_id>/reviews',
                  methods=['GET'],
                  strict_slashes=False)
-def get_review():
+def get_reviews():
     """ Retrieves a list of all Review objects. """
     rev = storage.all(Review)
     return jsonify([review.to_dict() for review in rev.values()])

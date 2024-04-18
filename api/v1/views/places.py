@@ -46,7 +46,7 @@ def delete_place(place_id):
 @app_views.route('/cities/<city_id>/places',
                  methods=['POST'],
                  strict_slashes=False)
-def create_user():
+def create_place():
     """ Creates a Place object. """
     if not request.get_json():
         abort(400, description="Not a JSON")
