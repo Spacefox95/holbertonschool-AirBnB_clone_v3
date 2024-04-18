@@ -1,3 +1,9 @@
+#!/usr/bin/python3
+"""
+Create a new state object handling default
+RESTFul API actions
+"""
+
 from flask import jsonify, request, abort
 from models import storage
 from models.city import City

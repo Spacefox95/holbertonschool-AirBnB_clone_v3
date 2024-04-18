@@ -1,3 +1,9 @@
+#!/usr/bin/python3
+"""
+Create a new state object handling default
+RESTFul API actions
+"""
+
 from api.v1.views import app_views
 from flask import jsonify
 from models import storage
