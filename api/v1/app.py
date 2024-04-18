@@ -6,15 +6,18 @@ import os
 app = Flask(__name__)
 app.register_blueprint(app_views)
 
+
 @app.errorhandler(404)
 def not_found(error):
-    """Handler for 404 errors that returns a JSON-formatted 404 status response."""
+    """Handler for 404 errors that returns a JSON 404 status response."""
     return jsonify({"error": "Not found"}), 404
+
 
 @app.teardown_appcontext
 def close_storage(exception):
     """Closes the storage on teardown."""
     storage.close()
+
 
 if __name__ == "__main__":
     host = os.getenv('HBNB_API_HOST', '0.0.0.0')
