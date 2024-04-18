@@ -6,6 +6,7 @@ RESTFul API actions
 
 from flask import jsonify, request, abort
 from models.place import Place
+from models.city import City
 from models import storage
 from api.v1.views import app_views
 
@@ -13,9 +14,11 @@ from api.v1.views import app_views
 @app_views.route('/cities/<city_id>/places',
                  methods=['GET'],
                  strict_slashes=False)
-def get_places():
+def get_places(city_id):
     """ Retrieves a list of all Place objects. """
-    places = storage.all(Place)
+    places = storage.all(City, city_id)
+    if places is None:
+        abort(404)
     return jsonify([place.to_dict() for place in places.values()])
 
 
@@ -46,10 +49,15 @@ def delete_place(place_id):
 @app_views.route('/cities/<city_id>/places',
                  methods=['POST'],
                  strict_slashes=False)
-def create_place():
+def create_place(city_id):
     """ Creates a Place object. """
+    places = storage.all(City, city_id)
+    if places is None:
+        abort(404)
     if not request.get_json():
         abort(400, description="Not a JSON")
+    if 'user_id' not in request.get_json():
+        abort(400, description="Missing user_id")
     if 'name' not in request.get_json():
         abort(400, description="Missing name")
     new_place = Place(**request.get_json())
@@ -69,7 +77,7 @@ def update_place(place_id):
     if not update_data:
         abort(400, description="Not a JSON")
     for key, value in update_data.items():
-        if key not in ['id', 'created_at', 'updated_at']:
+        if key not in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
             setattr(place, key, value)
     storage.save()
     return jsonify(place.to_dict()), 200
