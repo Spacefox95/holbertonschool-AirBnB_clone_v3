@@ -18,6 +18,8 @@ from api.v1.views import app_views
 def get_reviews(place_id):
     """ Retrieves a list of all Review objects. """
     rev = storage.get(Place, place_id)
+    if rev is None:
+        abort(404)
     return jsonify([review.to_dict() for review in rev.values()])
 
 
@@ -59,6 +61,7 @@ def create_review(place_id):
     if 'text' not in request.get_json():
         abort(400, description="Missing text")
     new_review = Review(**request.get_json())
+    new_review.place_id = place_id
     new_review.save()
     return jsonify(new_review.to_dict()), 201
 
@@ -76,5 +79,5 @@ def update_review(review_id):
         if key not in ['id', 'user_id', 'place_id',
                        'created_at', 'updated_at']:
             setattr(review, key, value)
-    storage.save()
+    review.save()
     return jsonify(review.to_dict()), 200
