@@ -20,7 +20,7 @@ def get_places(city_id):
     places = storage.get(City, city_id)
     if places is None:
         abort(404)
-    return jsonify([place.to_dict() for place in places.values()])
+    return jsonify([place.to_dict() for place in places.places])
 
 
 @app_views.route('/places/<place_id>',
@@ -84,5 +84,5 @@ def update_place(place_id):
     for key, value in update_data.items():
         if key not in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
             setattr(place, key, value)
-    storage.save(place)
+    place.save()
     return jsonify(place.to_dict()), 200
