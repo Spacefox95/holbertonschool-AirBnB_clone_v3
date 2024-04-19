@@ -17,10 +17,10 @@ from api.v1.views import app_views
                  strict_slashes=False)
 def get_reviews(place_id):
     """ Retrieves a list of all Review objects. """
-    rev = storage.get(Place, place_id)
-    if rev is None:
+    place = storage.get(Place, place_id)
+    if place is None:
         abort(404)
-    return jsonify([review.to_dict() for review in rev.values()])
+    return jsonify([review.to_dict() for review in place.reviews])
 
 
 @app_views.route('/reviews/<review_id>', methods=['GET'], strict_slashes=False)
