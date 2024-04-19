@@ -83,11 +83,13 @@ class DBStorage:
         return None
 
     def count(self, cls=None):
-        """Count the number of objects in storage optionally filtered by class."""
+        """
+        Count the number of objects in storage optionally filtered by class.
+        """
         if cls:
             return self.__session.query(cls).count()
         else:
-            all_classes = [State, User, Place, Review, City]  # add other classes as needed
+            all_classes = [State, User, Place, Review, City]
             total_count = 0
             for cls in all_classes:
                 total_count += self.__session.query(cls).count()
