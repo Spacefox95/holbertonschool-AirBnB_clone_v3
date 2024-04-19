@@ -17,10 +17,10 @@ from api.v1.views import app_views
                  strict_slashes=False)
 def get_places(city_id):
     """ Retrieves a list of all Place objects. """
-    places = storage.get(City, city_id)
-    if places is None:
+    city = storage.get(City, city_id)
+    if city is None:
         abort(404)
-    return jsonify([place.to_dict() for place in places.places])
+    return jsonify([place.to_dict() for place in city.places])
 
 
 @app_views.route('/places/<place_id>',
@@ -42,6 +42,8 @@ def delete_place(place_id):
     place = storage.get(Place, place_id)
     if place is None:
         abort(404)
+    for review in place.reviews:
+        storage.delete(review)
     storage.delete(place)
     storage.save()
     return jsonify({}), 200
