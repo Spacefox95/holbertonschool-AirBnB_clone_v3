@@ -7,6 +7,7 @@ from datetime import datetime
 import inspect
 import models
 from models.engine import db_storage
+from models import storage
 from models.amenity import Amenity
 from models.base_model import BaseModel
 from models.city import City
@@ -29,63 +30,67 @@ class TestDBStorageDocs(unittest.TestCase):
         """Set up for the doc tests"""
         cls.dbs_f = inspect.getmembers(DBStorage, inspect.isfunction)
 
-        def test_db_storage_module_docstring(self):
-            """Test for the db_storage.py module docstring"""
-            self.assertIsNot(db_storage.__doc__, None,
-                            "db_storage.py needs a docstring")
-            self.assertTrue(len(db_storage.__doc__) >= 1,
-                            "db_storage.py needs a docstring")
+    def test_db_storage_module_docstring(self):
+        """Test for the db_storage.py module docstring"""
+        self.assertIsNot(db_storage.__doc__, None,
+                         "db_storage.py needs a docstring")
+        self.assertTrue(len(db_storage.__doc__) >= 1,
+                        "db_storage.py needs a docstring")
 
-        def test_db_storage_class_docstring(self):
-            """Test for the DBStorage class docstring"""
-            self.assertIsNot(DBStorage.__doc__, None,
-                            "DBStorage class needs a docstring")
-            self.assertTrue(len(DBStorage.__doc__) >= 1,
-                            "DBStorage class needs a docstring")
+    def test_db_storage_class_docstring(self):
+        """Test for the DBStorage class docstring"""
+        self.assertIsNot(DBStorage.__doc__, None,
+                         "DBStorage class needs a docstring")
+        self.assertTrue(len(DBStorage.__doc__) >= 1,
+                        "DBStorage class needs a docstring")
 
-        def test_dbs_func_docstrings(self):
-            """Test for the presence of docstrings in DBStorage methods"""
-            for func in self.dbs_f:
-                self.assertIsNot(func[1].__doc__, None,
-                                "{:s} method needs a docstring".format(func[0]))
-                self.assertTrue(len(func[1].__doc__) >= 1,
-                                "{:s} method needs a docstring".format(func[0]))
-                
-        class TestDBStorage(unittest.TestCase):
-            """Tests for the DBStorage methods: get and count"""
+    def test_dbs_func_docstrings(self):
+        """Test for the presence of docstrings in DBStorage methods"""
+        for func in self.dbs_f:
+            self.assertIsNot(func[1].__doc__, None,
+                             "{:s} method needs a docstring".format(func[0]))
+            self.assertTrue(len(func[1].__doc__) >= 1,
+                            "{:s} method needs a docstring".format(func[0]))
 
-        @classmethod
-        def setUpClass(cls):
-            """Set up for test cases"""
-            cls.storage = DBStorage()
-            cls.storage.reload()
 
-        def test_get_none(self):
-            """Test get method with None as class or id"""
-            self.assertIsNone(cls.storage.get(None, None))
-            self.assertIsNone(cls.storage.get(State, None))
-            self.assertIsNone(cls.storage.get(None, 'some_id'))
+@unittest.skipIf(models.storage_t != 'db', "Testing DBstorage only")
+class test_DBStorage(unittest.TestCase):
+    '''
+        Testing the DB_Storage class
+    '''
+    @classmethod
+    def setUpClass(cls):
+        '''
+            Initializing classes
+        '''
+        cls.dbstorage = DBStorage()
 
-        def test_get_valid(self):
-            """Test get method with valid class and id"""
-            state = State(name="TestState")
-            cls.storage.new(state)
-            cls.storage.save()
-            queried_state = cls.storage.get(State, state.id)
-            self.assertEqual(queried_state, state)
+    def test_get_none(self):
+        """Test get method with None as class or id"""
+        self.assertIsNone(self.storage.get(None, None))
+        self.assertIsNone(self.storage.get(State, None))
+        self.assertIsNone(self.storage.get(None, 'some_id'))
 
-        def test_count_none(self):
-            """Test count method with None as class"""
-            initial_count = len(cls.storage.all())
-            self.assertEqual(cls.storage.count(), initial_count)
+    def test_get_valid(self):
+        """Test get method with valid class and id"""
+        state = State(name="TestState")
+        cls.storage.new(state)
+        cls.storage.save()
+        queried_state = cls.storage.get(State, state.id)
+        self.assertEqual(queried_state, state)
 
-        def test_count_valid_class(self):
-            """Test count method with valid class"""
-            initial_count = cls.storage.count(State)
-            state = State(name="TestState")
-            cls.storage.new(state)
-            cls.storage.save()
-            self.assertEqual(cls.storage.count(State), initial_count + 1)
+    def test_count_none(self):
+        """Test count method with None as class"""
+        initial_count = len(self.storage.all())
+        self.assertEqual(self.storage.count(), initial_count)
+
+    def test_count_valid_class(self):
+        """Test count method with valid class"""
+        initial_count = cls.storage.count(State)
+        state = State(name="TestState")
+        cls.storage.new(state)
+        cls.storage.save()
+        self.assertEqual(cls.storage.count(State), initial_count + 1)
 
 
 class TestFileStorage(unittest.TestCase):
